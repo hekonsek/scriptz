@@ -24,6 +24,12 @@ eval "$(scriptz prompt)"
 
 ## Local development
 
+Install the published CLI:
+
+```bash
+npm install -g @hekonsek/scriptz
+```
+
 Install dependencies:
 
 ```bash
