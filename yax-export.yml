@@ -1,7 +1,0 @@
-build:
-  agentsmd:
-    from:
-      - file:spex/**/*.md
-    output: _agents.md
-    metadata:
-      name: Instructions for terminal session scripts
