@@ -7,10 +7,6 @@ permissions:
   contents: write
   id-token: write
 
-concurrency:
-  group: release
-  cancel-in-progress: false
-
 jobs:
   release:
     name: Release
@@ -44,7 +40,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Bump version
-        run: npm version minor -m "chore(release): %s"
+        run: npm version minor
 
       - name: Push version commit and tag
         run: git push --follow-tags
