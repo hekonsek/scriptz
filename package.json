@@ -2,7 +2,16 @@
   "name": "@hekonsek/scriptz",
   "version": "0.6.0",
   "description": "CLI utilities for recording terminal sessions",
+  "license": "MIT",
   "type": "module",
+  "homepage": "https://github.com/hekonsek/scriptz#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hekonsek/scriptz.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hekonsek/scriptz/issues"
+  },
   "bin": {
     "scriptz": "dist/cli/cli.js"
   },
