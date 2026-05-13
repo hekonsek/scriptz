@@ -5,6 +5,7 @@ import { join } from "node:path";
 import chalk from "chalk";
 import { Command } from "commander";
 import { ScriptCommandNotFoundError, TerminalScripts, } from "../core/terminal-scripts.js";
+import { buildPromptAssignment } from "../core/shell-prompt.js";
 const defaultDependencies = {
     homeDirectory: homedir(),
     writeOut: (line) => {
@@ -46,6 +47,12 @@ export function createCli(deps = defaultDependencies) {
             }
             throw error;
         }
+    });
+    program
+        .command("prompt")
+        .description("Print a Bash prompt assignment with a random terminal title.")
+        .action(() => {
+        deps.writeOut(buildPromptAssignment());
     });
     program
         .command("clean")

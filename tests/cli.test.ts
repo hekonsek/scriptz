@@ -27,6 +27,26 @@ describe("CLI", () => {
     expect(exitCodes).toEqual([]);
   });
 
+  it("prints prompt assignment", async () => {
+    const out: string[] = [];
+    const err: string[] = [];
+    const deps: CliDependencies = {
+      homeDirectory: "/tmp",
+      writeOut: (line: string) => out.push(line),
+      writeErr: (line: string) => err.push(line),
+      setExitCode: () => undefined,
+      readVersion: async () => "1.2.3",
+    };
+
+    const cli = createCli(deps);
+    await cli.parseAsync(["node", "scriptz", "prompt"]);
+
+    expect(out).toHaveLength(1);
+    expect(out[0]).toMatch(/^PS1='/);
+    expect(out[0]).toMatch(/\\u@[a-z]+/);
+    expect(err).toEqual([]);
+  });
+
   it("removes old logs and reports summary", async () => {
     const tempRoot = await mkdtemp(join(tmpdir(), "scriptz-"));
     const logsDir = join(tempRoot, ".cache", "script");

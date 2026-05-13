@@ -12,8 +12,15 @@ This project provides a Node.js + TypeScript CLI for working with terminal sessi
 
 - `scriptz version` prints the package version.
 - `scriptz record` starts a new recording session.
+- `scriptz prompt` prints a Bash `PS1` assignment with a random terminal title.
 - `scriptz clean` removes recordings older than 15 minutes.
 - `scriptz clean --quiet` removes old recordings without output.
+
+Apply the generated prompt to the current shell:
+
+```bash
+eval "$(scriptz prompt)"
+```
 
 ## Local development
 

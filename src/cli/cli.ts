@@ -11,6 +11,7 @@ import {
   ScriptCommandNotFoundError,
   TerminalScripts,
 } from "../core/terminal-scripts.js";
+import { buildPromptAssignment } from "../core/shell-prompt.js";
 import type {
   TerminalScriptsEvent,
   TerminalScriptsListener,
@@ -76,6 +77,13 @@ export function createCli(deps: CliDependencies = defaultDependencies): Command 
 
         throw error;
       }
+    });
+
+  program
+    .command("prompt")
+    .description("Print a Bash prompt assignment with a random terminal title.")
+    .action(() => {
+      deps.writeOut(buildPromptAssignment());
     });
 
   program
