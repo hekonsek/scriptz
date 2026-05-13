@@ -2,5 +2,6 @@ export:
   ignores:
     - feature/**/*
 packages:
+  - hekonsek/scriptz
+  - hekonsek/adr-node
   - hekonsek/adr-node-cli
-  - hekonsek/spex-terminal-script
