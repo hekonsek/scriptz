@@ -1,6 +1,6 @@
 {
   "name": "@hekonsek/scriptz",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "CLI utilities for recording terminal sessions",
   "license": "MIT",
   "type": "module",
