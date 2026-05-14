@@ -2,7 +2,6 @@ import { join } from "node:path";
 
 import { FileSystemTerminalScriptsStore } from "./adapters/out/file-system-terminal-scripts-store.js";
 import { ScriptProcessRunner } from "./adapters/out/script-process-runner.js";
-import { ScriptCommandNotFoundError } from "./terminal-scripts.errors.js";
 import {
   noopTerminalScriptsListener,
   type TerminalScriptsListener,
@@ -27,6 +26,13 @@ export interface RecordProcessRunner {
 export interface CleanResult {
   directoryExists: boolean;
   removed: number;
+}
+
+export class ScriptCommandNotFoundError extends Error {
+  constructor() {
+    super("The 'script' command is not available.");
+    this.name = "ScriptCommandNotFoundError";
+  }
 }
 
 export class TerminalScriptsService {
@@ -117,9 +123,7 @@ function toErrorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
-
-    return String(error);
+  return String(error);
 }
 
-export { ScriptCommandNotFoundError };
 export { TerminalScriptsService as TerminalScripts };

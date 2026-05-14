@@ -1,7 +1,9 @@
 import { spawn } from "node:child_process";
 
-import type { RecordProcessRunner } from "../../terminal-scripts.service.js";
-import { ScriptCommandNotFoundError } from "../../terminal-scripts.errors.js";
+import {
+  ScriptCommandNotFoundError,
+  type RecordProcessRunner,
+} from "../../terminal-scripts.service.js";
 
 export class ScriptProcessRunner implements RecordProcessRunner {
   async run(logPath: string): Promise<number> {
