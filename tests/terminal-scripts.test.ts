@@ -14,9 +14,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   ScriptCommandNotFoundError,
-  TerminalScripts,
   type RecordProcessRunner,
-} from "../src/core/terminal-scripts.js";
+  TerminalScriptsService,
+} from "../src/services/terminal-scripts/terminal-scripts.service.js";
 
 class FakeRunner implements RecordProcessRunner {
   constructor(
@@ -44,7 +44,12 @@ describe("TerminalScripts", () => {
 
     try {
       const runner = new FakeRunner(7);
-      const scripts = new TerminalScripts(logsDirectory, undefined, runner);
+      const scripts = new TerminalScriptsService(
+        logsDirectory,
+        undefined,
+        undefined,
+        runner,
+      );
 
       const exitCode = await scripts.record();
 
@@ -77,7 +82,7 @@ describe("TerminalScripts", () => {
       const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
       await utimes(oldLog, thirtyMinutesAgo, thirtyMinutesAgo);
 
-      const scripts = new TerminalScripts(logsDirectory);
+      const scripts = new TerminalScriptsService(logsDirectory);
       const result = await scripts.clean(15);
 
       expect(result.directoryExists).toBe(true);
@@ -95,7 +100,7 @@ describe("TerminalScripts", () => {
     const logsDirectory = join(tempRoot, "missing");
 
     try {
-      const scripts = new TerminalScripts(logsDirectory);
+      const scripts = new TerminalScriptsService(logsDirectory);
       const result = await scripts.clean(15);
 
       expect(result.directoryExists).toBe(false);

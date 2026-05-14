@@ -1,11 +1,24 @@
-import { mkdir, readdir, stat, unlink } from "node:fs/promises";
-import { spawn } from "node:child_process";
 import { join } from "node:path";
 
+import { FileSystemTerminalScriptsStore } from "./adapters/out/file-system-terminal-scripts-store.js";
+import { ScriptProcessRunner } from "./adapters/out/script-process-runner.js";
+import { ScriptCommandNotFoundError } from "./terminal-scripts.errors.js";
 import {
   noopTerminalScriptsListener,
   type TerminalScriptsListener,
 } from "./terminal-scripts-listener.js";
+
+export interface TerminalScriptsEntry {
+  readonly name: string;
+}
+
+export interface TerminalScriptsStore {
+  ensureDirectory(): Promise<void>;
+  isDirectory(): Promise<boolean>;
+  listFiles(): Promise<TerminalScriptsEntry[]>;
+  modifiedAtMs(entryName: string): Promise<number>;
+  remove(entryName: string): Promise<void>;
+}
 
 export interface RecordProcessRunner {
   run(logPath: string): Promise<number>;
@@ -16,45 +29,18 @@ export interface CleanResult {
   removed: number;
 }
 
-export class ScriptCommandNotFoundError extends Error {
-  constructor() {
-    super("The 'script' command is not available.");
-    this.name = "ScriptCommandNotFoundError";
-  }
-}
-
-export class ScriptProcessRunner implements RecordProcessRunner {
-  async run(logPath: string): Promise<number> {
-    return new Promise<number>((resolve, reject) => {
-      const child = spawn("script", ["-q", "-f", logPath], {
-        stdio: "inherit",
-      });
-
-      child.once("error", (error: NodeJS.ErrnoException) => {
-        if (error.code === "ENOENT") {
-          reject(new ScriptCommandNotFoundError());
-          return;
-        }
-
-        reject(error);
-      });
-
-      child.once("close", (code: number | null) => {
-        resolve(code ?? 1);
-      });
-    });
-  }
-}
-
-export class TerminalScripts {
+export class TerminalScriptsService {
   constructor(
     private readonly directory: string,
     private readonly listener: TerminalScriptsListener = noopTerminalScriptsListener,
+    private readonly store: TerminalScriptsStore = new FileSystemTerminalScriptsStore(
+      directory,
+    ),
     private readonly processRunner: RecordProcessRunner = new ScriptProcessRunner(),
   ) {}
 
   async record(): Promise<number> {
-    await mkdir(this.directory, { recursive: true });
+    await this.store.ensureDirectory();
 
     const logPath = join(this.directory, `${buildTimestamp()}.log`);
     this.listener.onEvent({ type: "record_started", logPath });
@@ -63,35 +49,19 @@ export class TerminalScripts {
   }
 
   async clean(maxAgeMinutes = 15): Promise<CleanResult> {
-    try {
-      const directoryStat = await stat(this.directory);
-      if (!directoryStat.isDirectory()) {
-        return { directoryExists: false, removed: 0 };
-      }
-    } catch (error) {
-      const typedError = error as NodeJS.ErrnoException;
-      if (typedError.code === "ENOENT") {
-        return { directoryExists: false, removed: 0 };
-      }
-
-      throw error;
+    if (!(await this.store.isDirectory())) {
+      return { directoryExists: false, removed: 0 };
     }
 
-    const entries = await readdir(this.directory, { withFileTypes: true });
+    const entries = await this.store.listFiles();
     const cutoff = Date.now() - maxAgeMinutes * 60 * 1000;
     let removed = 0;
 
     for (const entry of entries) {
-      if (!entry.isFile()) {
-        continue;
-      }
-
-      const filePath = join(this.directory, entry.name);
       let modifiedAtMs: number;
 
       try {
-        const fileStat = await stat(filePath);
-        modifiedAtMs = fileStat.mtimeMs;
+        modifiedAtMs = await this.store.modifiedAtMs(entry.name);
       } catch (error) {
         const reason = toErrorMessage(error);
         this.listener.onEvent({
@@ -107,7 +77,7 @@ export class TerminalScripts {
       }
 
       try {
-        await unlink(filePath);
+        await this.store.remove(entry.name);
         removed += 1;
       } catch (error) {
         const typedError = error as NodeJS.ErrnoException;
@@ -148,5 +118,8 @@ function toErrorMessage(error: unknown): string {
     return error.message;
   }
 
-  return String(error);
+    return String(error);
 }
+
+export { ScriptCommandNotFoundError };
+export { TerminalScriptsService as TerminalScripts };

@@ -9,13 +9,13 @@ import { Command } from "commander";
 
 import {
   ScriptCommandNotFoundError,
-  TerminalScripts,
-} from "../core/terminal-scripts.js";
-import { buildPromptAssignment } from "../core/shell-prompt.js";
+  TerminalScriptsService,
+} from "../../../services/terminal-scripts/terminal-scripts.service.js";
+import { ShellPromptService } from "../../../services/shell-prompt/shell-prompt.service.js";
 import type {
   TerminalScriptsEvent,
   TerminalScriptsListener,
-} from "../core/terminal-scripts-listener.js";
+} from "../../../services/terminal-scripts/terminal-scripts-listener.js";
 
 export interface CliDependencies {
   readonly homeDirectory: string;
@@ -58,7 +58,7 @@ export function createCli(deps: CliDependencies = defaultDependencies): Command 
     .command("record")
     .description("Start a script(1) recording session.")
     .action(async () => {
-      const scripts = new TerminalScripts(
+      const scripts = new TerminalScriptsService(
         join(deps.homeDirectory, ".cache", "script"),
       );
 
@@ -83,7 +83,7 @@ export function createCli(deps: CliDependencies = defaultDependencies): Command 
     .command("prompt")
     .description("Print a Bash prompt assignment with a random terminal title.")
     .action(() => {
-      deps.writeOut(buildPromptAssignment());
+      deps.writeOut(new ShellPromptService().buildAssignment());
     });
 
   program
@@ -92,7 +92,7 @@ export function createCli(deps: CliDependencies = defaultDependencies): Command 
     .option("-q, --quiet", "Suppress command output.", false)
     .action(async (options: { quiet: boolean }) => {
       const listener = buildCleanListener(options.quiet, deps);
-      const scripts = new TerminalScripts(
+      const scripts = new TerminalScriptsService(
         join(deps.homeDirectory, ".cache", "script"),
         listener,
       );
@@ -131,7 +131,7 @@ export async function runCli(argv: string[] = process.argv): Promise<void> {
 }
 
 async function readVersion(): Promise<string> {
-  const packageJsonPath = new URL("../../package.json", import.meta.url);
+  const packageJsonPath = new URL("../../../../package.json", import.meta.url);
   const packageJsonRaw = await readFile(packageJsonPath, "utf8");
   const packageJson = JSON.parse(packageJsonRaw) as { version?: string };
 

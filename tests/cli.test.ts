@@ -4,7 +4,10 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { createCli, type CliDependencies } from "../src/cli/cli.js";
+import {
+  createCli,
+  type CliDependencies,
+} from "../src/adapters/in/cli/cli.js";
 
 describe("CLI", () => {
   it("prints version from dependency", async () => {
