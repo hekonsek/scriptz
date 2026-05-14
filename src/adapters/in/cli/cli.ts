@@ -50,8 +50,8 @@ export function createCli(deps: CliDependencies = defaultDependencies): Command 
   program
     .command("version")
     .description("Display the installed package version.")
-    .action(async () => {
-      deps.writeOut(await deps.versionService.packageVersion());
+    .action(() => {
+      deps.writeOut(deps.versionService.packageVersion());
     });
 
   program

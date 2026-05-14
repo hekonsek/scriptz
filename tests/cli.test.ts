@@ -19,7 +19,7 @@ describe("CLI", () => {
       writeOut: (line: string) => out.push(line),
       writeErr: (line: string) => err.push(line),
       setExitCode: (code: number) => exitCodes.push(code),
-      versionService: { packageVersion: async () => "1.2.3" },
+      versionService: { packageVersion: () => "1.2.3" },
     };
 
     const cli = createCli(deps);
@@ -38,7 +38,7 @@ describe("CLI", () => {
       writeOut: (line: string) => out.push(line),
       writeErr: (line: string) => err.push(line),
       setExitCode: () => undefined,
-      versionService: { packageVersion: async () => "1.2.3" },
+      versionService: { packageVersion: () => "1.2.3" },
     };
 
     const cli = createCli(deps);
@@ -74,7 +74,7 @@ describe("CLI", () => {
         writeOut: (line: string) => out.push(line),
         writeErr: (line: string) => err.push(line),
         setExitCode: (code: number) => exitCodes.push(code),
-        versionService: { packageVersion: async () => "0.1.0" },
+        versionService: { packageVersion: () => "0.1.0" },
       };
 
       const cli = createCli(deps);
@@ -99,7 +99,7 @@ describe("CLI", () => {
         writeOut: (line: string) => out.push(line),
         writeErr: (line: string) => err.push(line),
         setExitCode: () => undefined,
-        versionService: { packageVersion: async () => "0.1.0" },
+        versionService: { packageVersion: () => "0.1.0" },
       };
 
       const cli = createCli(deps);
