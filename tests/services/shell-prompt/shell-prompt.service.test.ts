@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildPromptAssignment } from "../src/services/shell-prompt/shell-prompt.service.js";
+import { buildPromptAssignment } from "../../../src/services/shell-prompt/shell-prompt.service.js";
 
 describe("shell prompt", () => {
   it("builds the requested Bash prompt assignment", () => {

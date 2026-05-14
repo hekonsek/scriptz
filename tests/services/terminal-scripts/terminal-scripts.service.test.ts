@@ -16,7 +16,7 @@ import {
   ScriptCommandNotFoundError,
   type RecordProcessRunner,
   TerminalScriptsService,
-} from "../src/services/terminal-scripts/terminal-scripts.service.js";
+} from "../../../src/services/terminal-scripts/terminal-scripts.service.js";
 
 class FakeRunner implements RecordProcessRunner {
   constructor(
