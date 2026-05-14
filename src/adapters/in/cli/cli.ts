@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { readFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
@@ -16,13 +15,14 @@ import type {
   TerminalScriptsEvent,
   TerminalScriptsListener,
 } from "../../../services/terminal-scripts/terminal-scripts-listener.js";
+import { VersionService } from "../../../services/version/version.service.js";
 
 export interface CliDependencies {
   readonly homeDirectory: string;
   readonly writeOut: (line: string) => void;
   readonly writeErr: (line: string) => void;
   readonly setExitCode: (code: number) => void;
-  readVersion: () => Promise<string>;
+  readonly versionService: Pick<VersionService, "packageVersion">;
 }
 
 const defaultDependencies: CliDependencies = {
@@ -36,7 +36,7 @@ const defaultDependencies: CliDependencies = {
   setExitCode: (code: number): void => {
     process.exitCode = code;
   },
-  readVersion,
+  versionService: new VersionService(),
 };
 
 export function createCli(deps: CliDependencies = defaultDependencies): Command {
@@ -51,7 +51,7 @@ export function createCli(deps: CliDependencies = defaultDependencies): Command 
     .command("version")
     .description("Display the installed package version.")
     .action(async () => {
-      deps.writeOut(await deps.readVersion());
+      deps.writeOut(await deps.versionService.packageVersion());
     });
 
   program
@@ -128,14 +128,6 @@ export async function runCli(argv: string[] = process.argv): Promise<void> {
   }
 
   await program.parseAsync(argv);
-}
-
-async function readVersion(): Promise<string> {
-  const packageJsonPath = new URL("../../../../package.json", import.meta.url);
-  const packageJsonRaw = await readFile(packageJsonPath, "utf8");
-  const packageJson = JSON.parse(packageJsonRaw) as { version?: string };
-
-  return packageJson.version ?? "0.0.0";
 }
 
 function buildCleanListener(
